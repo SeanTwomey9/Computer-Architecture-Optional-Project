@@ -1,0 +1,7 @@
+Verilog Variable Types
+
+Wire: helper variable, does not hold values only stores, disappears after value is passed on
+Register variables: Stores variables
+Parameters 
+Input Variables
+Output Variables
