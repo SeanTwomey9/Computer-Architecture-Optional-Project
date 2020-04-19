@@ -54,4 +54,25 @@ public class MIPSConversion {
 			
 		}
 	}
+	
+	public void findAlways() {
+
+		String b = "begin";
+		String e = "end";
+		int alwaysIndex;
+		
+		for(int i = 0; i < tokens.size(); i++) {
+			
+			if(tokens.contains(b)) {
+				
+				alwaysIndex = i;
+				
+			}
+			
+			while(tokens.equals(b) || !tokens.equals(e)) {
+				
+				holdAlways.set(i, tokens.get(i));
+			}
+		}
+	}
 }
