@@ -27,10 +27,7 @@ public class MIPSConversion {
 			command += line.charAt(k);
 			k ++;
 		}
-		if(command.contentEquals("module"))
-			createModule(line);
-		else if(command.equals("parameter"))
-			createParameter(line);
+		
 	}
 	void createModule(String line)
 	{
