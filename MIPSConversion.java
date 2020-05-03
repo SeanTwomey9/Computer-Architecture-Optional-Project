@@ -27,7 +27,8 @@ public class MIPSConversion {
 			command += line.charAt(k);
 			k ++;
 		}
-		
+		if(command=="always")
+			//go somewhere
 	}
 	void createModule(String line)
 	{
