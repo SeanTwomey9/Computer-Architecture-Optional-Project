@@ -13,13 +13,11 @@ public class MIPSConversion {
 		int length = tokens.size();
 		for(int i = 0; i < length; i ++)
 		{
-			//testForAlways(tokens.get(i));
-			testForVariable(tokens.get(i));
-			
+			testLine(tokens.get(i));
 		}
 		
 	}
-	void testForVariable(String line)
+	void testLine(String line)
 	{
 		String command = "";
 		int k = 0;
@@ -28,6 +26,12 @@ public class MIPSConversion {
 			command += line.charAt(k);
 			k ++;
 		}
+		//testForAlways(line, command)
+		testForVariable(line, command)
+	}
+	void testForVariable(String line, String command)
+	{
+		
 		line = line.substring(k+1,line.length());
 		switch(command.toLowerCase())
 		{
