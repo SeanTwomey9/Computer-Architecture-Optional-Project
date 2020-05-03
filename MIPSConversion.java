@@ -30,31 +30,6 @@ public class MIPSConversion {
 		if(command=="always")
 			//go somewhere
 	}
-	void createModule(String line)
-	{
-		String moduleName = "";
-		for(int i = 7; line.charAt(i) != '('; i ++)
-			moduleName += line.charAt(i);
-		
-	}
-	void createParameter(String line)
-	{
-		int parSize = 1;
-		boolean escape = false;
-		for(int i =0; !escape && i < line.length() ; i ++)
-		{
-			if(line.charAt(i) == '[')
-			{
-				parSize = line.charAt(i+1);
-				escape = true;
-			}
-		}
-		if(parSize < 32)
-		{
-			
-		}
-	}
-	
 	public void findAlways() {
 
 		String b = "begin";
