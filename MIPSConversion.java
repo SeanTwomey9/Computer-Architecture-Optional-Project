@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 
 public class MIPSConversion {
-	ArrayList<String> tokens;
-	ArrayList<String> writtenMIPs;
+	private ArrayList<String> tokens;
+	private ArrayList<String> writtenMIPs;
+	private ArrayList<String> holdAlways;
+	private int alwaysCounter;
 	MIPSConversion(ArrayList<String> arr)
 	{
 		tokens = arr;
@@ -75,4 +77,11 @@ public class MIPSConversion {
 			}
 		}
 	}
+	
+	public void concatenateAlways() {
+		
+		if(alwaysCounter > 1) {
+			
+		}
+}
 }
