@@ -26,6 +26,7 @@ public class MIPSConversion {
 			command += line.charAt(k);
 			k ++;
 		}
+		command=command.toLowercase();
 		if(command=="always")
 			//setStart();
 		testForVariable(line, command)
