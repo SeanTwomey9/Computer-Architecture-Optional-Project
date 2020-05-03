@@ -26,7 +26,8 @@ public class MIPSConversion {
 			command += line.charAt(k);
 			k ++;
 		}
-		//testForAlways(line, command)
+		if(command=="always")
+			//setStart();
 		testForVariable(line, command)
 	}
 	void testForVariable(String line, String command)
