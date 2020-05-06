@@ -46,22 +46,31 @@ public class MIPSConversion {
 			//testForAlways(line, command);
 		testForVariable(line, command, loc);
 	}
-	void testForVariable(String line, String command)
+	void testForVariable(String line, String command, int loc)
 	{
 		switch(command.toLowerCase())
 		{
 		case "input":
-			varList.addInputVar(line);
+			varList.addInputVar(line, loc);
+			return;
 		case "output":
-			varList.addOutputVar(line);
+			varList.addOutputVar(line, loc);
+			return;
 		case "reg":
-			varList.addRegisterVar(line);
+			varList.addRegisterVar(line, loc);
+			return;
 		case "wire":
-			varList.addWireVar(line);
+			varList.addWireVar(line, loc);
+			return;
 		case "parameter":
-			varList.addParameter(line);
+			varList.addParameter(line, loc);
+			return;
 		default:
 			return;
 		}
+	}
+	VariableList getVarList()
+	{
+		return varList;
 	}
 }
