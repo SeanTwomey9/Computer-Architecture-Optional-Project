@@ -8,26 +8,21 @@ public class Always {
 	private static ArrayList<String> input;
 	private static ArrayList<String> output;
 	private static String condition = "";
+	private static int start;
 	
-	public Always(String condition) {
+	public Always(String line, int loc) {
 		
-		this.condition = condition;
+		condition = findCondition(line);
+		start = loc;
 	}
 	
-	public static void findCondition() {
+	public static void findCondition(String line) {
 		
-		String beginCondition = "(";
-		String endCondition = ")";
+		int i = 0;
+		while(line.charAt(i) != '(')
+			i ++;
+		condition = substring(i+1);
 		
-		
-		for(int i = 0; i < fileLines.size(); i ++) {
-			
-			while(fileLines.get(i).equals(beginCondition) && (!fileLines.get(i).equals(endCondition))) {
-				
-				condition = fileLines.get(i);
-				condition = condition.toLowerCase();
-			}
-		}
 	}
 	
 	public static void compareConditions(String con) {
