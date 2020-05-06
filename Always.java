@@ -16,7 +16,7 @@ public class Always {
 		start = loc + 2;
 	}
 	
-	public static void findCondition(String line) {
+	public static String findCondition(String line) {
 		
 		int i = 0;
 		while(line.charAt(i) != '(')
