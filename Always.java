@@ -13,25 +13,6 @@ public class Always {
 		this.condition = condition;
 	}
 	
-	public static void addFile() {
-		
-		File file = new File("/Users/seantwomey/Desktop/CWRU /Junior Year/Spring 2020/EECS 314/Project/test.txt");
-		try {
-			Scanner scan = new Scanner(file);
-			
-			while(scan.hasNextLine()) {
-				lines.add((scan.nextLine()));
-			}
-			
-			scan.close();
-		}
-		
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-}
-	
 	public static void setStart() {
 		
 		String begin = "begin";
