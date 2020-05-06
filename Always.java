@@ -13,31 +13,6 @@ public class Always {
 		this.condition = condition;
 	}
 	
-	public static void setStart() {
-		
-		String begin = "begin";
-		
-		for(int i = 0; i < lines.size(); i++) {
-			
-			if(lines.contains(begin)) {
-				
-				bookEnds[0] = i;
-			}
-		}
-	}
-	
-	public static void setFinish() {
-		
-		String finish = "finish";
-		
-		for(int i = 0; i < lines.size(); i++) {
-			
-			if(lines.contains(finish)) {
-				
-				bookEnds[1] = i;
-			}
-		}
-	}
 	
 	public static void findCondition() {
 		
