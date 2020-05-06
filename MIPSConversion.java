@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class MIPSConversion {
-	ArrayList<String> lines;
+	static ArrayList<String> lines;
 	ArrayList<String> writtenMIPs;
 	ArrayList<Always> always;
 	VariableList varList = new VariableList();
@@ -18,6 +18,11 @@ public class MIPSConversion {
 		}
 		
 	}
+	
+	public static  ArrayList getLines() {
+			
+			return lines;
+		}
 	void testLine(String line)
 	{
 		String command = "";
