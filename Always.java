@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.lang.*;
 import java.io.*;
 
 public class Always {
@@ -13,7 +14,7 @@ public class Always {
 	public Always(String line, int loc) {
 		
 		condition = findCondition(line);
-		start = loc + 2;
+		start = loc;
 	}
 	
 	public static String findCondition(String line) {
@@ -21,7 +22,7 @@ public class Always {
 		int i = 0;
 		while(line.charAt(i) != '(')
 			i ++;
-		line = substring(i+1);
+		line = line.substring(i+1);
 		String condition = "";
 		i = 0;
 		while(line.charAt(i) != ')')
@@ -32,36 +33,31 @@ public class Always {
 		return condition;
 	}
 	
-	public static void trimLines() {
+	public static void trimfileLines() {
 		int end;
 		boolean stop = false;
-		int totalBegins = 1;
-		for(int i = start; i < lines.length() && !stop; i ++)
+		for(int i = start; i < fileLines.size() && !stop; i ++)
 		{	
-			if(line.get(i).contains("begin"))
-				totalBegins ++;
-			else if(lines.get(i).contains("end") && totalBegins == 1)
+			if(fileLines.get(i).equals("end"));
 			{
 				end = i;
 				stop = true;
 			}
-			else if(lines.get(i).contains("end") && totalBegins > 1)
-				totalBegins --;
 		}
-		//change lines to be start to end
+		//change fileLines to be start to end
 	}
-	public static void compareConditions(String con) {
+	/*public static void compareConditions(String con) {
 		
 		if(condition.contentEquals(con))
 			//test for time delays and determine order
 			
 	}
 	
-	public static void findOutputs() {
+	/*public static void findOutputs() {
 		
 		for(int i = 0; i < fileLines.size(); i++) {
 			
 			if()
 		}
-	}
+	}*/
 }
