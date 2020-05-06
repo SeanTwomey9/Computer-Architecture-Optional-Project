@@ -4,7 +4,7 @@ public class Always {
 
 	private static ArrayList<String> tokens;
 	private static int [] bookEnds = new int[2];
-	private String condition;
+	private static String condition;
 	
 	public Always(String condition) {
 		
@@ -33,6 +33,22 @@ public class Always {
 			if(tokens.contains(finish)) {
 				
 				bookEnds[1] = i;
+			}
+		}
+	}
+	
+	public static void findCondition() {
+		
+		String beginCondition = "(";
+		String endCondition = ")";
+		
+		
+		for(int i = 0; i < tokens.size(); i ++) {
+			
+			while(tokens.get(i).equals(beginCondition) && (!tokens.get(i).equals(endCondition))) {
+				
+				condition = tokens.get(i);
+				condition = condition.toLowerCase();
 			}
 		}
 	}
