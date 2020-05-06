@@ -13,7 +13,7 @@ public class Always {
 	public Always(String line, int loc) {
 		
 		condition = findCondition(line);
-		start = loc;
+		start = loc + 2;
 	}
 	
 	public static void findCondition(String line) {
@@ -35,13 +35,18 @@ public class Always {
 	public static void trimLines() {
 		int end;
 		boolean stop = false;
+		int totalBegins = 1;
 		for(int i = start; i < lines.length() && !stop; i ++)
 		{	
-			if(lines.get(i).equals("end");
+			if(line.get(i).contains("begin"))
+				totalBegins ++;
+			else if(lines.get(i).contains("end") && totalBegins == 1)
 			{
 				end = i;
 				stop = true;
 			}
+			else if(lines.get(i).contains("end") && totalBegins > 1)
+				totalBegins --;
 		}
 		//change lines to be start to end
 	}
