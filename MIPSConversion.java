@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class MIPSConversion {
-	ArrayList<String> tokens;
+	ArrayList<String> lines;
 	ArrayList<String> writtenMIPs;
 	VariableList varList = new VariableList();
 	MIPSConversion(ArrayList<String> arr)
@@ -10,10 +10,10 @@ public class MIPSConversion {
 	}
 	void parseTokens()
 	{
-		int length = tokens.size();
+		int length = lines.size();
 		for(int i = 0; i < length; i ++)
 		{
-			testLine(tokens.get(i));
+			testLine(lines.get(i));
 		}
 		
 	}
