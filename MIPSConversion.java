@@ -1,13 +1,12 @@
 import java.util.ArrayList;
 
 public class MIPSConversion {
-	static ArrayList<String> lines;
-	ArrayList<String> writtenMIPs;
-	ArrayList<Always> always;
-	VariableList varList = new VariableList();
+	private static ArrayList<String> lines;
+	private VariableList varList = new VariableList();
+	MIPSConversion() {}
 	MIPSConversion(ArrayList<String> arr)
 	{
-		tokens = arr;
+		lines = arr;
 	}
 	void parseLines()
 	{
