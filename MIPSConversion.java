@@ -8,7 +8,7 @@ public class MIPSConversion {
 	{
 		tokens = arr;
 	}
-	void parseTokens()
+	void parseLines()
 	{
 		int length = lines.size();
 		for(int i = 0; i < length; i ++)
