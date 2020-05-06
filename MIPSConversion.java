@@ -28,8 +28,12 @@ public class MIPSConversion {
 		}
 		command=command.toLowercase();
 		if(command=="always")
-			setStart();
+			testForAlways(line, command);
 		testForVariable(line, command)
+	}
+	void testForAlways(String line)
+	{
+		
 	}
 	void testForVariable(String line, String command)
 	{
