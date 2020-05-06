@@ -8,15 +8,6 @@ public class MIPSConversion {
 	{
 		lines = arr;
 	}
-	void parseLines()
-	{
-		int length = lines.size();
-		for(int i = 0; i < length; i ++)
-		{
-			testLine(lines.get(i));
-		}
-		
-	}
 	
 	public static  ArrayList getLines() {
 			
