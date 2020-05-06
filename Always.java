@@ -32,6 +32,19 @@ public class Always {
 		return condition;
 	}
 	
+	public static void trimLines() {
+		int end;
+		boolean stop = false;
+		for(int i = start; i < lines.length() && !stop; i ++)
+		{	
+			if(lines.get(i).equals("end");
+			{
+				end = i;
+				stop = true;
+			}
+		}
+		//change lines to be start to end
+	}
 	public static void compareConditions(String con) {
 		
 		if(condition.contentEquals(con))
