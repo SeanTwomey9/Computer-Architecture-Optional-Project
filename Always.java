@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Always {
 
-	private static ArrayList<String> fileLines = MipsConversion.getLines();
+	private static ArrayList<String> fileLines = MIPSConversion.getLines();
 	private static ArrayList<String> input;
 	private static ArrayList<String> output;
 	private static String condition = "";
@@ -37,8 +37,11 @@ public class Always {
 			
 	}
 	
-	public static void findInputs() {
+	public static void findOutputs() {
 		
-		
+		for(int i = 0; i < fileLines.size(); i++) {
+			
+			if()
+		}
 	}
 }
