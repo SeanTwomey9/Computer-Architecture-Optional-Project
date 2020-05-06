@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class MIPSConversion {
 	ArrayList<String> lines;
 	ArrayList<String> writtenMIPs;
+	ArrayList<Always> always;
 	VariableList varList = new VariableList();
 	MIPSConversion(ArrayList<String> arr)
 	{
@@ -33,6 +34,7 @@ public class MIPSConversion {
 	}
 	void testForAlways(String line)
 	{
+		Always temp = new Always();
 		
 	}
 	void testForVariable(String line, String command)
