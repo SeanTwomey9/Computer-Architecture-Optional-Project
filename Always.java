@@ -21,8 +21,15 @@ public class Always {
 		int i = 0;
 		while(line.charAt(i) != '(')
 			i ++;
-		condition = substring(i+1);
-		
+		line = substring(i+1);
+		String condition = "";
+		i = 0;
+		while(line.charAt(i) != ')')
+		{
+			condition += line.charAt(i);
+			i ++;
+		}
+		return condition;
 	}
 	
 	public static void compareConditions(String con) {
