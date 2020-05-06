@@ -54,4 +54,9 @@ public class Always {
 			}
 		}
 	}
+	public void compareConditions(String con)
+	{
+		if(condition.contentEquals(con))
+			//test for time delays and determine order
+	}
 }
