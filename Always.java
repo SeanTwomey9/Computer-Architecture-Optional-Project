@@ -18,20 +18,24 @@ public class Always {
 		start = loc;
 	}
 	
+	/**
+	 * Identifies and returns the condition of an always statement
+	 * @param line: the input string containing the condition
+	 */
 	public static String findCondition(String line) {
 		
-		int i = 0;
-		while(line.charAt(i) != '(')
-			i ++;
-		line = line.substring(i+1);
-		String condition = "";
-		i = 0;
-		while(line.charAt(i) != ')')
-		{
-			condition += line.charAt(i);
-			i ++;
+		StringBuilder newCondition = new StringBuilder();
+		int beginCondition =line.indexOf('(') + 1; //Starts with "(" and ends with ")"
+		int endCondition = line.indexOf(')');
+		
+		
+		for(int i = beginCondition; i< endCondition; i++) {
+			
+			newCondition.append(line.charAt(i));
 		}
-		return condition;
+		
+		System.out.println(newCondition.toString());
+		return null;
 	}
 	
 	public static void trimfileLines() {
@@ -44,7 +48,7 @@ public class Always {
 				end = i;
 				stop = true;
 			}	
-				fileLines.removeAll(fileLines);
+				//fileLines.removeAll(fileLines);
 				fileLines.add(i, fileLines.get(i));
 			}
 		}
@@ -106,7 +110,15 @@ public class Always {
 	public static void main(String[] args) {
 	
 	addFile("/Users/seantwomey/Desktop/CWRU /Junior Year/Spring 2020/EECS 314/Project/test.txt");	
+	findCondition("always @ (posedge clk)");
 	
+	Always test = new Always("always @ (posedge clk)", 102);
+	test.trimfileLines();
+	
+	for(String s: fileLines) {
+		
+		System.out.println(s);
+	}
 
 }
 }
