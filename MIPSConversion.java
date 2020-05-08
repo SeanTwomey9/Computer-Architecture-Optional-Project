@@ -2,20 +2,21 @@ import java.util.ArrayList;
 
 public class MIPSConversion {
 	private static ArrayList<String> lines;
-	private VariableList varList = new VariableList();
+	private ArrayList<String> MIPSCode;
+	private Lists lists = new Lists();
 	MIPSConversion() {}
 	MIPSConversion(ArrayList<String> arr)
 	{
 		lines = arr;
 	}
-	
-	public static  ArrayList getLines() {
-			
-			return lines;
-		}
 	void parseLines()
 	{
 		int length = lines.size();
+		for(int i = 0; i < length; i ++)
+		{
+			testForVariable(lines.get(i), i);
+		}
+		assignVariables();
 		for(int i = 0; i < length; i ++)
 		{
 			testLine(lines.get(i), i);
@@ -25,57 +26,90 @@ public class MIPSConversion {
 	{
 		String command = "";
 		int k = 0;
-		while(line.charAt(k) != ' ')
+		if(!line.contentEquals("begin") && !line.contentEquals("end") &&!line.contentEquals("endmodule"))
+		{
+			while(line.charAt(k) != ' ' && line.charAt(k) != '(')
+			{
+				command += line.charAt(k);
+				k ++;
+			}
+			line = line.substring(k+1);
+			command=command.toLowerCase();
+			if(command.contentEquals("module"))
+				createModule(line);
+			testForOperation(line, command, loc);
+		}
+	}
+	void testForVariable(String line, int loc)
+	{
+		String command = "";
+		int k = 0;
+		while(line.charAt(k) != ' ' && line.charAt(k) != '(')
 		{
 			command += line.charAt(k);
 			k ++;
 		}
 		line = line.substring(k+1);
 		command=command.toLowerCase();
-		if(command=="always")
-			//testForAlways(line, command);
-		testForVariable(line, command, loc);
-		
-		if(command == "if") {
-			
-			testForVariable(line, command, loc);
-			
-			if(command == "else if") {
-				
-				testForVariable(line, command, loc);
-			}
-			
-			if(command == "else") {
-				
-				testForVariable(line, command, loc);
-			}
-		}
-	}
-	void testForVariable(String line, String command, int loc)
-	{
-		switch(command.toLowerCase())
+		switch(command)
 		{
 		case "input":
-			varList.addInputVar(line, loc);
+			lists.addInputVar(line, loc);
 			return;
 		case "output":
-			varList.addOutputVar(line, loc);
+			lists.addOutputVar(line, loc);
 			return;
 		case "reg":
-			varList.addRegisterVar(line, loc);
+			lists.addRegisterVar(line, loc);
 			return;
 		case "wire":
-			varList.addWireVar(line, loc);
+			lists.addWireVar(line, loc);
 			return;
 		case "parameter":
-			varList.addParameter(line, loc);
+			lists.addParameter(line, loc);
 			return;
 		default:
 			return;
 		}
 	}
-	VariableList getVarList()
+	void testForOperation(String line, String command, int loc)
 	{
-		return varList;
+		ArrayList<String> operation = new ArrayList<String>();
+		if(lists.testForVariable(command) && line.contains("="))
+			operation = lists.convertOp(new Operation(command, line, loc));
+		else if(command.contentEquals("assign"))
+		{
+			int i = 0;
+			command = "";
+			while(line.charAt(i) != '=')
+			{
+				command += line.charAt(i);
+				i ++;
+			}
+			command = command.substring(0, command.length() - 1);
+			operation = lists.convertOp(new Operation(command, line.substring(i), loc));
+		}
+		MIPSCode.addAll(operation);
+	}
+	void createModule(String line)
+	{
+		//System.out.println(line + ", " + command);
+		int i = 0;
+		String name = "";
+		while(line.charAt(i) != ' ' && line.charAt(i) != '(')
+		{
+			name += line.charAt(i);
+			i ++;
+		}
+		name += ": ";
+		MIPSCode.add(name);
+	}
+	void assignVariables()
+	{
+		lists.assignVariables();
+	}
+	Lists getVarList()
+	{
+		return lists;
 	}
 }
