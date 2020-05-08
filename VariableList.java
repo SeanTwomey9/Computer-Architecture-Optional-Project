@@ -2,9 +2,15 @@ import java.util.ArrayList;
 
 public class VariableList {
 	ArrayList<Variable> VariableList;
-	VariableList()
+	ArrayList<Operation> OperationList;
+	int unusedTemp;
+	int unusedStack;
+ 	VariableList()
 	{
 		VariableList = new ArrayList<Variable>();
+		OperationList = new ArrayList<Operation>();
+		unusedTemp = 0;
+		unusedStack = 0;
 	}
 	boolean contains(Variable var)
 	{
@@ -27,8 +33,7 @@ public class VariableList {
 		{
 			line = removeSize(line);
 			addMultipleVar(line, 'r', loc, '=');
-			int value = findValue(line);
-			addValue(value, loc);
+			addValue(findValue(line, loc), loc);
 		}
 	}
 	void addWireVar(String line, int loc)
@@ -39,25 +44,12 @@ public class VariableList {
 		{
 			line = removeSize(line);
 			addMultipleVar(line, 'w', loc, '=');
-			int value = findValue(line);
-			addValue(value, loc);
+			addValue(findValue(line, loc), loc);
 		}
 	}
 	void addOutputVar(String line, int loc)
 	{
-		String nextWord = "";
-		int k = 0;
-		while(line.charAt(k) != ' ')
-		{	
-			nextWord += line.charAt(k);
-			k ++;
-		}
-		line = line.substring(k+1);
-		if(nextWord.contains("["))
-			line = removeSize(line);
-		else if(!nextWord.contentEquals("reg"))
-			addVariable(new Variable(nextWord, 'o', loc));
-		addMultipleVar(line, 'o', loc, ';');
+		addMultipleVar(removeSize(line), 'o', loc, ';');
 	}
 	void addParameter(String line, int loc)
 	{
@@ -70,7 +62,7 @@ public class VariableList {
 			i ++;
 		}
 		line = line.substring(i+1);
-		int value = findValue(line);
+		int value = findValue(line, loc);
 		addVariable(new Variable(name, 'p', value, loc));
 	}
 	void addVariable(Variable var)
@@ -110,10 +102,11 @@ public class VariableList {
 	{
 		if(line.contains(","))
 		{
-			int i = 0;
+			int i;
 			while(line.contains(","))
 			{
 				String name = "";
+				i = 0;
 				while(line.charAt(i) != ',')
 				{
 					name += line.charAt(i);
@@ -149,73 +142,412 @@ public class VariableList {
 			addVariable(new Variable(name, d, loc));
 		}
 	}
-	int findValue(String line)
+	int findValue(String line, int loc)
 	{
-		int value=0;
+		int value = 0;
 		if(line.contains("'"))
 		{	
-			int i = line.indexOf("'");
-			char radix = line.charAt(i + 1);
-			line = line.substring(i+2);
-			i = 0;
-			switch(radix)
-			{
-			case 'b':
-				while(line.charAt(i) != ';')
-				{
-					value += Character.getNumericValue(line.charAt(i))*(Math.pow(2, i));
-					i ++;
-				}
-				return value;
-			case 'h':
-				while(line.charAt(i) != ';')
-				{
-					if(line.charAt(i)=='a')
-						value += 10*(Math.pow(16, i));
-					else if(line.charAt(i)=='b')
-						value += 11*(Math.pow(16, i));
-					else if(line.charAt(i)=='c')
-						value += 12*(Math.pow(16, i));
-					else if(line.charAt(i)=='d')
-						value += 13*(Math.pow(16, i));
-					else if(line.charAt(i)=='e')
-						value += 14*(Math.pow(16, i));
-					else if(line.charAt(i)=='f')
-						value += 15*(Math.pow(16, i));
-					else
-						value += Character.getNumericValue(line.charAt(i))*(Math.pow(16, i));
-					i ++;
-				}
-				return value;
-			case 'd':
-				while(line.charAt(i) != ';')
-				{
-					value += Character.getNumericValue(line.charAt(i))*(Math.pow(10, i));
-					i ++;
-				}
-				return value;
-			case 'o':
-				while(line.charAt(i) != ';')
-				{
-					value += Character.getNumericValue(line.charAt(i))*(Math.pow(8, i));
-					i ++;
-				}
-			}
+			value = findNumericValue(line);
 		}
 		else
 		{
-			int i = 0;
-			while(line.charAt(i) != ';')
-				value += Character.getNumericValue(line.charAt(i))*(Math.pow(10, i));
+			ArrayList<String> names = new ArrayList<String>();
+			int i = VariableList.size()-1;
+			while(VariableList.get(i).currentAccess != loc)
+			{
+				names.add(VariableList.get(i).name);
+				i --;
+			}
+			for(int j = 0; j < names.size(); j ++)
+				OperationList.add(new Operation(names.get(j), line, loc));
 		}
 		return value;
 	}
-	Variable get(int i)
+	int findNumericValue(String line)
 	{
-		return VariableList.get(i);
+		int value = 0;
+		int i = line.indexOf("'");
+		char radix = line.charAt(i + 1);
+		line = line.substring(i+2);
+		i = 0;
+		switch(radix)
+		{
+		case 'b':
+			while(line.charAt(i) != ';')
+			{
+				value += Character.getNumericValue(line.charAt(i))*(Math.pow(2, i));
+				i ++;
+			}
+			return value;
+		case 'h':
+			while(line.charAt(i) != ';')
+			{
+				if(line.charAt(i)=='a')
+					value += 10*(Math.pow(16, i));
+				else if(line.charAt(i)=='b')
+					value += 11*(Math.pow(16, i));
+				else if(line.charAt(i)=='c')
+					value += 12*(Math.pow(16, i));
+				else if(line.charAt(i)=='d')
+					value += 13*(Math.pow(16, i));
+				else if(line.charAt(i)=='e')
+					value += 14*(Math.pow(16, i));
+				else if(line.charAt(i)=='f')
+					value += 15*(Math.pow(16, i));
+				else
+					value += Character.getNumericValue(line.charAt(i))*(Math.pow(16, i));
+				i ++;
+			}
+			return value;
+		case 'd':
+			while(line.charAt(i) != ';')
+			{
+				value += Character.getNumericValue(line.charAt(i))*(Math.pow(10, i));
+				i ++;
+			}
+			return value;
+		case 'o':
+			while(line.charAt(i) != ';')
+			{
+				value += Character.getNumericValue(line.charAt(i))*(Math.pow(8, i));
+				i ++;
+			}
+			return value;
+		default:
+			return value;
+		}
 	}
-	int size()
+	boolean testForVariable(String word)
 	{
-		return VariableList.size();
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(word.contentEquals(VariableList.get(i).name))
+				return true;
+		}
+		return false;
+	}
+	int getVariableValue(String name)
+	{
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(name.contentEquals(VariableList.get(i).name))
+				return VariableList.get(i).currentValue;
+		}
+		return 0;
+	}
+	void assignVariables()
+	{
+		int[] datatypes = new int[5];
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			switch(VariableList.get(i).datatype)
+			{
+			case 'i':
+				VariableList.get(i).Register = "$a" + datatypes[0];
+				datatypes[0] ++;
+			case 'o':
+				VariableList.get(i).Register = "$v" + datatypes[1];
+				datatypes[1] ++;
+			case 'w':
+				VariableList.get(i).Register = "$t" + datatypes[2];
+				datatypes[2] ++;
+			case 'r':
+				VariableList.get(i).Register = "$s" + datatypes[3];
+				datatypes[3] ++;
+			case 'p':
+				VariableList.get(i).Register = "$sp " + datatypes[4];
+				datatypes[4] += 4;
+			}
+			unusedTemp = datatypes[2];
+			unusedStack = datatypes[4];
+		}
+	}
+	boolean registerAssigned(String reg)
+	{
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(VariableList.get(i).Register.contentEquals(reg))
+				return true;
+		}
+		return false;
+	}
+	void convertOperationList()
+	{
+		for(int i = 0; i < OperationList.size(); i ++)
+		{
+			convertOp(OperationList.get(i));
+		}
+	}
+	void convertOp(Operation oper)
+	{
+		String temp;
+		int k;
+		ArrayList<String> compiledMIPS = new ArrayList<String>();
+		for(int j = 0; j < oper.input.size(); j ++)
+		{
+			String input1 = "";
+			String input2 = "";
+			String op = "";
+			temp = oper.input.get(j);
+			k = 0;
+			while(!testForVariable(input1))
+			{	
+				input1 += temp.charAt(k);
+				k ++;
+			} 
+			boolean end = false;
+			while(!end)
+			{
+				temp = temp.substring(k + 1);
+				k = 0;
+				op = "";
+				input2 = "";
+				while(temp.charAt(k) != ' ')
+				{
+					op += temp.charAt(k);
+					k ++;
+				}
+				temp = temp.substring(k + 1);
+				k = 0;
+				while(!testForVariable(input2))
+				{
+					input2 += temp.charAt(k);
+					k ++;
+				}
+				if(temp.length() == k)
+				{
+					compiledMIPS.addAll(operationTable(op, input1, input2, oper.output));
+					end = true;
+				}
+				else
+				{
+					compiledMIPS.addAll(operationTable(op, input1, input2, "$t" + unusedTemp));
+					input1 = "$t" + unusedTemp;
+				}
+			}
+		}
+		System.out.print(compiledMIPS);
+	}
+	ArrayList<String> operationTable(String op, String input1, String input2, String output)
+	{
+		ArrayList<String> ops = new ArrayList<String>();
+		switch(op)
+		{
+		case "~":
+			ops.add("nor " + output + ", " + input1 + ", $zero");
+			return ops;
+		case "&":
+			if(input2.contains("$"))
+			{
+				ops.add("and " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("andi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "|":
+			if(input2.contains("$"))
+			{
+				ops.add("or " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("ori " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "^":
+			if(input2.contains("$"))
+			{
+				ops.add("xor " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("xori " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "~&":
+			if(input2.contains("$"))
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("and " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+			else
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("andi " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+		case "~|":
+			if(input2.contains("$"))
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("or " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+			else
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("ori " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+		case "~^":
+			if(input2.contains("$"))
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("xor " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+			else
+			{
+				String temp = "$t" + unusedTemp;
+				ops.add("xori " + temp + ", " + input1 + ", " + input2);
+				ops.add("nor " + output + ", " + temp + ", $zero");
+				return ops;
+			}
+		case "+":
+			if(input2.contains("$"))
+			{
+				ops.add("add " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("addi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "-":
+			if(input2.contains("$"))
+			{
+				ops.add("sub " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("subi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "*":
+			if(input2.contains("$"))
+			{
+				ops.add("mult " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("multi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "/":
+			if(input2.contains("$"))
+			{
+				ops.add("div " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("divi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "%":
+			if(input2.contains("$"))
+			{
+				ops.add("rem " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("remi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "<<":
+			ops.add("sll " + output + ", " + input1 + ", " + input2);
+			return ops;
+		case ">>":
+			ops.add("srl " + output + ", " + input1 + ", " + input2);
+			return ops;
+		case ">":
+			if(input2.contains("$"))
+			{
+				ops.add("sgt " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("sgti " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "<":
+			if(input2.contains("$"))
+			{
+				ops.add("slt " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("slti " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case ">=":
+			if(input2.contains("$"))
+			{
+				ops.add("sge " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("sgei " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "<=":
+			if(input2.contains("$"))
+			{
+				ops.add("sle " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("slei " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "==":
+			if(input2.contains("$"))
+			{
+				ops.add("seq " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("seqi " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		case "!=":
+			if(input2.contains("$"))
+			{
+				ops.add("sne " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+			else
+			{
+				ops.add("snei " + output + ", " + input1 + ", " + input2);
+				return ops;
+			}
+		default:
+			ops.add("");
+			return ops;
+		}
+	}
+	void addOperation(Operation op)
+	{
+		OperationList.add(op);
 	}
 }
