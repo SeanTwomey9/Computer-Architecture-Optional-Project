@@ -294,16 +294,24 @@ public class Lists {
 					}
 					if(temp.length() == k)
 					{
-						if(input1.contains("$"))
+						if(input1.contains("$t"))
 							compiledMIPS.addAll(operationTable(op, input1, findRegister(input2), findRegister(oper.output)));
+						else if(input2.contains("$t"))
+							compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
+						else if(input1.contains("$t") && input2.contains("$t"))
+							compiledMIPS.addAll(operationTable(op, input1, input2, findRegister(oper.output)));
 						else
 							compiledMIPS.addAll(operationTable(op, findRegister(input1), findRegister(input2), findRegister(oper.output)));
 						end = true;
 					}
 					else
 					{
-						if(input1.contains("$"))
+						if(input1.contains("$t"))
 							compiledMIPS.addAll(operationTable(op, input1, findRegister(input2), "$t" + unusedTemp));
+						else if(input2.contains("$t"))
+							compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, "$t" + unusedTemp));
+						else if(input1.contains("$t") && input2.contains("$t"))
+							compiledMIPS.addAll(operationTable(op, input1, input2, "$t" + unusedTemp));
 						else
 							compiledMIPS.addAll(operationTable(op, findRegister(input1), findRegister(input2), "$t" + unusedTemp));
 						input1 = "$t" + unusedTemp;
@@ -323,10 +331,14 @@ public class Lists {
 				}
 				temp = temp.substring(k + 1);
 				input2 += findNumericValue(temp + ";");
-				compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
+				if(input1.contains("$t"))
+					compiledMIPS.addAll(operationTable(op, input1, input2, findRegister(oper.output)));
+				else if(oper.output.contains("$t"))
+					compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, oper.output));
+				else
+					compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
 			}
 		}
-		System.out.println(compiledMIPS);
 		return compiledMIPS;
 	}
 	String findRegister(String name)
@@ -556,42 +568,29 @@ public class Lists {
 			return ops;
 		}
 	}
-	
-	public void evaluateIf(String line, int loc) {
+	int getUnusedTemp()
+	{
+		int temp = unusedTemp;
+		unusedTemp ++;
+		return temp;
+	}
+	void returnUnusedTemp()
+	{
+		unusedTemp --;
+	}
+	public void evaluateIf(String line, int loc)
+	{
 		
 		Operation ifStatement = new Operation("$t"+unusedTemp, line, loc);
 		unusedTemp++;
 		convertOp(ifStatement);
 		unusedTemp--;
 	}
-	
-	public void evaluateElse(String line, int loc) {
-		
+	public void evaluateElse(String line, int loc)
+	{
 		Operation elseStatement = new Operation("$t"+unusedTemp, line, loc);
 		unusedTemp++;
 		convertOp(elseStatement);
 		unusedTemp--;
-	}
-	
-	/**
-	 * Identifies and returns the condition of an if statement
-	 * @param line: the input string containing the condition
-	 */
-	public static String findCondition(String line) {
-		
-		StringBuilder newCondition = new StringBuilder();
-		
-		int beginCondition =line.indexOf('(') + 1; //Starts with "(" and ends with ")"
-		int endCondition = line.indexOf(')');
-		
-		
-		for(int i = beginCondition; i< endCondition; i++) {
-			
-			newCondition.append(line.charAt(i));
-		}
-		
-		ifConditions.add(newCondition.toString());
-		System.out.println(newCondition.toString());
-		return null;
 	}
 }
