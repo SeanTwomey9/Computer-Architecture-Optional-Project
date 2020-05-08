@@ -4,15 +4,15 @@ module Lab6Behavoral (En, X, Y, Kin, U, Kout);
 	reg [1:0] z;
 	always @ (*)
 	begin
-		if(En == 0)
-		begin 
+		if(En == 1'b0)
+		begin
 			z = X + Y + Kin;
 		end
-		if(En == 1) 
+		else if(En == 1'b1) 
 		begin
 			z = X - Y + Kin;
 		end
 	end
-	assign {Kout, U} = z;
+	assign Kout = z & 2'b10;
+	assign U = z & 2'b01;
 endmodule
-	
