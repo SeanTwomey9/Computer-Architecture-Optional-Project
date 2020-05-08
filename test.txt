@@ -1,143 +1,18 @@
-module priorityArbiter(gt1, gt2, gt3, clk, error_flag, gs1, gs2, gs3);
-	//Initializing state parameters
-	parameter [2:0] IDLE = 3'b000;
-	parameter [2:0] GS1 = 3'b001;
-	parameter [2:0] GS2 = 3'b010;
-	parameter [2:0] GS3 = 3'b100;
-	parameter [2:0] ERR = 3'b111;
-	//Creating 3 bit variables to hold the value of the current state and the next state
-	reg [2:0] state;
-	wire [2:0] next_state;
-	//Setting input and output variables
-	input gt1, gt2, gt3, clk;
-	output reg error_flag, gs1, gs2, gs3;
-	/*	Assigning next_state to a function that determines what the next state
-		according to the given parameters
-	*/
-	assign next_state = fsm_function(state, gt1, gt2, gt3);
-	//Creating a function to define the next state
-	function [2:0] fsm_function;
-		//Defining input variables for the function
-		input [2:0] state;
-		input gt1, gt2, gt3;
-		//Creating test variable that is 1 if multiple inputs are 1
-		reg test = (gt1 & gt2) | (gt2 & gt3) | (gt3 & gt1);
-		//Case statement to cover the possible input combinations
-		case(state)
-		IDLE: /*	When in idle, there are 5 possible input combinations, each in a specific
-					order to make sure to follow the priority of the arbiter.
-					Option 1: if multiple inputs are logic 1, go to state ERR
-					Option 2: if gt1 is logic 1, go to state GS1
-					Option 3: if gt2 is logic 1 & gt1 is logic 0, go to state GS2
-					Option 4: if gt3 is logic 1 & gt2 and gt1 is logic 0, go to state GS3
-					Option 5: if none of the variables are logic 1, remain in state IDLE
-				*/
-				if(test == 1) begin
-					fsm_function = ERR;
-				end
-				else if(gt1 == 1'b1) begin
-					fsm_function = GS1;
-				end
-				else if(gt2 == 1'b1) begin
-					fsm_function = GS2;
-				end
-				else if(gt3 == 1'b1) begin
-					fsm_function = GS3;
-				end
-				else begin
-					fsm_function = IDLE;
-				end
-		GS1: 	/*	When in GS1, you can either go to error, remain here, go to IDLE. Has 
-					3 different if statements to cover these options.
-				*/
-				if(test == 1'b1) begin
-					fsm_function = ERR;
-				end
-				else if(gt1 == 1'b1) begin
-					fsm_function = GS1;
-				end
-				else begin
-					fsm_function = IDLE;
-				end
-		GS2: 	/*	When in GS2, you can either go to error, remain here, go to IDLE. Has 
-					3 different if statements to cover these options.
-				*/
-				if(test == 1'b1) begin
-					fsm_function = ERR;
-				end
-				else if(gt2 == 1'b1) begin
-					fsm_function = GS2;
-				end
-				else begin
-					fsm_function = IDLE;
-				end
-		GS3:  /*	When in GS3, you can either go to error, remain here, go to IDLE. Has 
-					3 different if statements to cover these options.
-				*/
-				if(test == 1'b1) begin
-					fsm_function = ERR;
-				end
-				else if(gt3 == 1'b1) begin
-					fsm_function = GS3;
-				end
-				else begin
-					fsm_function = IDLE;
-				end
-		ERR:	/* When in ERR, you can only remain here or return to IDLE. Has 2 different
-					if statements to cover these possibilities.
-				*/
-				if(test == 1'b1) begin
-					fsm_function = ERR;
-				end
-				else begin
-					fsm_function = IDLE;
-				end
-				//Default to IDLE at the start
-		default: fsm_function = IDLE;
-		endcase
-	endfunction
-	/*	Always statement to observe changes in the clock. When the clock changes from 0 to 1, 
-		the next state is assigned to the current state.	
-	*/
-	always @ (posedge clk)
+module Lab6Behavoral (En, X, Y, Kin, U, Kout);
+	input En, X, Y, Kin;
+	output U, Kout;
+	reg [1:0] z;
+	always @ (*)
 	begin
-		state <= #1 next_state;
+		if(En == 0)
+		begin 
+			z = X + Y + Kin;
+		end
+		if(En == 1) 
+		begin
+			z = X - Y + Kin;
+		end
 	end
-	//Assigning values to the outputs at the different possible states.
-	always @ (posedge clk)
-	begin
-		case(state)
-		IDLE: begin
-					gs1 <= 			#1 1'b0;
-					gs2 <= 			#1 1'b0;
-					gs3 <= 			#1 1'b0;
-					error_flag <= 	#1 1'b0;
-				end
-		GS1:	begin
-					gs1 <= 			#1 1'b1;
-					gs2 <= 			#1 1'b0;
-					gs3 <= 			#1 1'b0;
-					error_flag <= 	#1 1'b0;
-				end
-		GS2:	begin
-					gs1 <= 			#1 1'b0;
-					gs2 <= 			#1 1'b1;
-					gs3 <= 			#1 1'b0;
-					error_flag <= 	#1 1'b0;
-				end
-		GS3:	begin
-					gs1 <= 			#1 1'b0;
-					gs2 <= 			#1 1'b0;
-					gs3 <= 			#1 1'b1;
-					error_flag <= 	#1 1'b0;
-				end
-		ERR:	begin
-					gs1 <= 			#1 1'b0;
-					gs2 <= 			#1 1'b0;
-					gs3 <= 			#1 1'b0;
-					error_flag <= 	#1 1'b1;
-				end
-		endcase
-	end
+	assign {Kout, U} = z;
 endmodule
 	
