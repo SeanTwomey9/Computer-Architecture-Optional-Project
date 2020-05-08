@@ -1,48 +1,28 @@
-import java.util.ArrayList;
-
 public class Variable {
-	ArrayList<Integer> valueHistory = new ArrayList<Integer>();
-	int currentValue;
+	int value;
 	char datatype;
-	ArrayList<Integer> accessHistory = new ArrayList<Integer>();
-	int currentAccess;
+	int declaredLoc;
 	String name;
 	String Register;
-	Variable(String n, char d, int v, int line)
+	Variable(String n, char d, int v, int loc)
 	{
 		addName(n);
 		datatype = d;
-		currentValue = v;
-		valueHistory.add(currentValue);
-		currentAccess = line;
-		accessHistory.add(currentAccess);
+		value = v;
+		declaredLoc = loc;
 	}
-	Variable(String n, char d, int line)
+	Variable(String n, char d, int loc)
 	{
 		addName(n);
 		datatype =d;
-		currentValue = 0;
-		valueHistory.add(currentValue);
-		currentAccess = line;
-		accessHistory.add(currentAccess);
+		value = 0;
+		declaredLoc = loc;
 	}
 	boolean compareTo(Variable var)
 	{
 		if(name.equals(var.name))
 			return true;
 		return false;
-	}
-	void changeValue(Variable var)
-	{
-		currentValue=var.currentValue;
-		valueHistory.add(currentValue);
-		currentAccess=var.currentAccess;
-		accessHistory.add(currentAccess);
-	}
-	void declaredValue(int value)
-	{
-		currentValue=value;
-		valueHistory.add(valueHistory.size() - 1, value);
 	}
 	void addName(String n)
 	{
