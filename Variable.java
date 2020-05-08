@@ -7,6 +7,7 @@ public class Variable {
 	ArrayList<Integer> accessHistory = new ArrayList<Integer>();
 	int currentAccess;
 	String name;
+	String Register;
 	Variable(String n, char d, int v, int line)
 	{
 		addName(n);
