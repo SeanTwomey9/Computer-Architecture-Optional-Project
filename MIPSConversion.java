@@ -66,13 +66,15 @@ public class MIPSConversion {
 		}
 		else if(command.contentEquals("assign"))
 		{
-			int i = 1;
+			int i = 0;
+			command = "";
 			while(line.charAt(i) != '=')
 			{
 				command += line.charAt(i);
 				i ++;
 			}
-			varList.addOperation(new Operation(command, line.substring(i + 1), loc));
+			command = command.substring(0, command.length() - 1);
+			varList.addOperation(new Operation(command, line.substring(i), loc));
 		}
 	}
 	void assignVariables()
