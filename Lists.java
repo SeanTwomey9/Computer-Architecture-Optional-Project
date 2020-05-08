@@ -556,4 +556,20 @@ public class Lists {
 			return ops;
 		}
 	}
+	
+	public void evaluateIf(String line, int loc) {
+		
+		Operation ifStatement = new Operation("$t"+unusedTemp, line, loc);
+		unusedTemp++;
+		convertOp(ifStatement);
+		unusedTemp--;
+	}
+	
+	public void evaluateElse(String line, int loc) {
+		
+		Operation elseStatement = new Operation("$t"+unusedTemp, line, loc);
+		unusedTemp++;
+		convertOp(elseStatement);
+		unusedTemp--;
+	}
 }
