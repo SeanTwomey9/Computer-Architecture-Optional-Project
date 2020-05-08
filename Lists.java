@@ -1,15 +1,31 @@
 import java.util.ArrayList;
 
+/**
+ * Comprehensive class to house variables, registers, and other essential items for conversion
+ * @author neilwible + seantwomey
+ *
+ */
 public class Lists {
+	//Array list to hold identified variables
 	ArrayList<Variable> VariableList;
+	//Number of unused temporary varaibles
 	int unusedTemp;
+	//Number of unused stack objects
 	int unusedStack;
- 	Lists()
+ 	/**
+ 	 * Constructor for Lists assigning the variablelist to a list composed of variables 
+ 	 */
+	Lists()
 	{
 		VariableList = new ArrayList<Variable>();
 		unusedTemp = 0;
 		unusedStack = 0;
 	}
+	/**
+	 * If a variable already exists in the list boolean
+	 * @param var
+	 * @return true/false
+	 */
 	boolean contains(Variable var)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -17,12 +33,22 @@ public class Lists {
 			if(var.compareTo(VariableList.get(i)))
 				return true;
 		}
-		return false;
+		return false; //ensures no duplicates
 	}
+	/**
+	 * Method to add an input variable 
+	 * @param line
+	 * @param loc
+	 */
 	void addInputVar(String line, int loc)
 	{
 		addMultipleVar(removeSize(line), 'i', loc, ';');
 	}
+	/**
+	 * Method to add a register variable 
+	 * @param line
+	 * @param loc
+	 */
 	void addRegisterVar(String line, int loc)
 	{
 		if(!line.contains("="))
@@ -34,21 +60,36 @@ public class Lists {
 			addValue(findNumericValue(line), loc);
 		}
 	}
+	/**
+	 * Adds a wire variable 
+	 * @param line
+	 * @param loc
+	 */
 	void addWireVar(String line, int loc)
 	{
 		if(!line.contains("="))
 			addMultipleVar(removeSize(line), 'w', loc, ';');
 		else
 		{
-			line = removeSize(line);
+			line = removeSize(line); //removes size and adds value
 			addMultipleVar(line, 'w', loc, '=');
 			addValue(findNumericValue(line), loc);
 		}
 	}
+	/**
+	 * Adds output variable
+	 * @param line
+	 * @param loc
+	 */
 	void addOutputVar(String line, int loc)
 	{
 		addMultipleVar(removeSize(line), 'o', loc, ';');
 	}
+	/**
+	 * Adds parameter 
+	 * @param line
+	 * @param loc
+	 */
 	void addParameter(String line, int loc)
 	{
 		line = removeSize(line);
@@ -56,12 +97,17 @@ public class Lists {
 		int i = 0;
 		while(line.charAt(i) != ' ')
 		{
-			name += line.charAt(i);
+			name += line.charAt(i); //adds name character by character 
 			i ++;
 		}
 		line = line.substring(i+1);
-		addVariable(new Variable(name, 'p', findNumericValue(line), loc));
+		addVariable(new Variable(name, 'p', findNumericValue(line), loc)); //instantiates new variable
 	}
+	/**
+	 * deletes the size given
+	 * @param line
+	 * @return
+	 */
 	String removeSize(String line)
 	{
 		if(line.charAt(0) == '[')
@@ -73,6 +119,11 @@ public class Lists {
 		}
 		return line;
 	}
+	/**
+	 * Assigns values
+	 * @param value
+	 * @param loc
+	 */
 	void addValue(int value, int loc)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -83,6 +134,10 @@ public class Lists {
 			}
 		}
 	}
+	/**
+	 * Adds a variable to the variablelist
+	 * @param var
+	 */
 	void addVariable(Variable var)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -95,6 +150,13 @@ public class Lists {
 		}
 		VariableList.add(var);
 	}
+	/**
+	 * Adds multiple variables based on the location, parameter, line,etc
+	 * @param line
+	 * @param d
+	 * @param loc
+	 * @param param
+	 */
 	void addMultipleVar(String line, char d, int loc, char param)
 	{
 		if(line.contains(","))
@@ -106,7 +168,7 @@ public class Lists {
 				i = 0;
 				while(line.charAt(i) != ',')
 				{
-					name += line.charAt(i);
+					name += line.charAt(i); //appends to the name
 					i ++;
 				}
 				i ++;
@@ -115,7 +177,7 @@ public class Lists {
 					i ++;
 				}
 				line = line.substring(i);
-				addVariable(new Variable(name, d, loc));
+				addVariable(new Variable(name, d, loc)); //instatiates a new variable
 			}
 			String name = "";
 			i = 0;
@@ -139,6 +201,11 @@ public class Lists {
 			addVariable(new Variable(name, d, loc));
 		}
 	}
+	/**
+	 * Finds numerical value according to character
+	 * @param line
+	 * @return
+	 */
 	int findNumericValue(String line)
 	{
 		int value = 0;
@@ -159,7 +226,7 @@ public class Lists {
 			while(line.charAt(i) != ';')
 			{
 				if(line.charAt(i)=='a')
-					value += 10*(Math.pow(16, i));
+					value += 10*(Math.pow(16, i)); //assigns values based on the input character 
 				else if(line.charAt(i)=='b')
 					value += 11*(Math.pow(16, i));
 				else if(line.charAt(i)=='c')
@@ -193,6 +260,11 @@ public class Lists {
 			return value;
 		}
 	}
+	/**
+	 * Inputs a word and tests to see if it is a variable in the variablelist
+	 * @param word
+	 * @return true/false
+	 */
 	boolean testForVariable(String word)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -202,6 +274,11 @@ public class Lists {
 		}
 		return false;
 	}
+	/**
+	 * Returns the value of the variable 
+	 * @param name
+	 * @return
+	 */
 	int getVariableValue(String name)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -211,6 +288,9 @@ public class Lists {
 		}
 		return 0;
 	}
+	/**
+	 * Assigns the variables based on an array of datatypes
+	 */
 	void assignVariables()
 	{
 		int[] datatypes = new int[4];
@@ -226,7 +306,7 @@ public class Lists {
 				VariableList.get(i).Register = "$v" + datatypes[1];
 				datatypes[1] ++;
 			}
-			else if(VariableList.get(i).datatype == 'w')
+			else if(VariableList.get(i).datatype == 'w') //assigns variables to appropriate registers
 			{
 				VariableList.get(i).Register = "$t" + datatypes[2];
 				datatypes[2] ++;
@@ -241,9 +321,14 @@ public class Lists {
 				VariableList.get(i).Register = "$a" + datatypes[2];
 				datatypes[2] ++;
 			}
-			unusedTemp = datatypes[2];
+			unusedTemp = datatypes[2]; //instantiates unusedTemp
 		}
 	}
+	/**
+	 * Returns whether or not a value of the variablelist has been assigned to a register
+	 * @param reg
+	 * @return true/false
+	 */
 	boolean registerAssigned(String reg)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -253,6 +338,11 @@ public class Lists {
 		}
 		return false;
 	}
+	/**
+	 * Converts operation in convertOp array list
+	 * @param oper
+	 * @return compiledMIPS output array list
+	 */
 	ArrayList<String> convertOp(Operation oper)
 	{
 		String temp;
@@ -261,7 +351,7 @@ public class Lists {
 		for(int j = 0; j < oper.input.size(); j ++)
 		{
 			String input1 = "";
-			String input2 = "";
+			String input2 = ""; //instantiates empty strings for inputs 1 and 2, as well as the operation
 			String op = "";
 			temp = oper.input.get(j);
 			k = 0;
@@ -316,7 +406,7 @@ public class Lists {
 							compiledMIPS.addAll(operationTable(op, findRegister(input1), findRegister(input2), "$t" + unusedTemp));
 						input1 = "$t" + unusedTemp;
 						unusedTemp ++;
-					}
+					} //adds operations from operation table to compiledMIPS
 				}
 				unusedTemp = originalUnusedTemp;
 			}
@@ -339,8 +429,13 @@ public class Lists {
 					compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
 			}
 		}
-		return compiledMIPS;
+		return compiledMIPS; //returns finished compiledMIPS output array list at the end
 	}
+	/**
+	 * Returns a register based on the input name
+	 * @param name
+	 * @return
+	 */
 	String findRegister(String name)
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
@@ -350,6 +445,14 @@ public class Lists {
 		}
 		return "";
 	}
+	/**
+	 * Acts as a table of operations and adds appropriate MIPS commands based on switch statement
+	 * @param op
+	 * @param input1
+	 * @param input2
+	 * @param output
+	 * @return
+	 */
 	ArrayList<String> operationTable(String op, String input1, String input2, String output)
 	{
 		ArrayList<String> ops = new ArrayList<String>();
@@ -565,30 +668,47 @@ public class Lists {
 			}
 		default:
 			ops.add("");
-			return ops;
+			return ops; //returns MIPS array list of statements upon conclusion
 		}
 	}
+	/**
+	 * gets the unused temporary variables count
+	 * @return temp
+	 */
 	int getUnusedTemp()
 	{
 		int temp = unusedTemp;
 		unusedTemp ++;
 		return temp;
 	}
+	/**
+	 * returns the decremented unusedtemp variable
+	 */
 	void returnUnusedTemp()
 	{
 		unusedTemp --;
 	}
+	/**
+	 * Converts if statement to an operation and assigns appropriate register
+	 * @param line
+	 * @param loc
+	 */
 	public void evaluateIf(String line, int loc)
 	{
 		
-		Operation ifStatement = new Operation("$t"+unusedTemp, line, loc);
+		Operation ifStatement = new Operation("$t"+unusedTemp, line, loc); //assigns operation
 		unusedTemp++;
 		convertOp(ifStatement);
 		unusedTemp--;
 	}
+	/**
+	 * Converts else statement to an operation and assigns appropriate register
+	 * @param line
+	 * @param loc
+	 */
 	public void evaluateElse(String line, int loc)
 	{
-		Operation elseStatement = new Operation("$t"+unusedTemp, line, loc);
+		Operation elseStatement = new Operation("$t"+unusedTemp, line, loc); //assigns operation
 		unusedTemp++;
 		convertOp(elseStatement);
 		unusedTemp--;
