@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-public class VariableList {
+public class Lists {
 	ArrayList<Variable> VariableList;
 	ArrayList<Operation> OperationList;
 	int unusedTemp;
 	int unusedStack;
- 	VariableList()
+ 	Lists()
 	{
 		VariableList = new ArrayList<Variable>();
 		OperationList = new ArrayList<Operation>();
@@ -64,18 +64,6 @@ public class VariableList {
 		line = line.substring(i+1);
 		addVariable(new Variable(name, 'p', findNumericValue(line), loc));
 	}
-	void addVariable(Variable var)
-	{
-		for(int i = 0; i < VariableList.size(); i ++)
-		{
-			if(VariableList.get(i).compareTo(var))
-			{
-				VariableList.get(i).changeValue(var);
-				return;
-			}
-		}
-		VariableList.add(var);
-	}
 	String removeSize(String line)
 	{
 		if(line.charAt(0) == '[')
@@ -91,11 +79,23 @@ public class VariableList {
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
-			if(VariableList.get(i).currentAccess == loc)
+			if(VariableList.get(i).declaredLoc == loc)
 			{
-				VariableList.get(i).declaredValue(value);
+				VariableList.get(i).value = value;
 			}
 		}
+	}
+	void addVariable(Variable var)
+	{
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(var.name.contentEquals(VariableList.get(i).name))
+			{
+				VariableList.set(i, var);
+				return;
+			}
+		}
+		VariableList.add(var);
 	}
 	void addMultipleVar(String line, char d, int loc, char param)
 	{
@@ -209,7 +209,7 @@ public class VariableList {
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
 			if(name.contentEquals(VariableList.get(i).name))
-				return VariableList.get(i).currentValue;
+				return VariableList.get(i).value;
 		}
 		return 0;
 	}
@@ -218,21 +218,28 @@ public class VariableList {
 		int[] datatypes = new int[4];
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
-			switch(VariableList.get(i).datatype)
+			if(VariableList.get(i).datatype == 'i')
 			{
-			case 'i':
 				VariableList.get(i).Register = "$a" + datatypes[0];
 				datatypes[0] ++;
-			case 'o':
+			}
+			else if(VariableList.get(i).datatype == 'o')
+			{
 				VariableList.get(i).Register = "$v" + datatypes[1];
 				datatypes[1] ++;
-			case 'w':
+			}
+			else if(VariableList.get(i).datatype == 'w')
+			{
 				VariableList.get(i).Register = "$t" + datatypes[2];
 				datatypes[2] ++;
-			case 'r':
+			}
+			else if(VariableList.get(i).datatype == 'r')
+			{
 				VariableList.get(i).Register = "$s" + datatypes[3];
 				datatypes[3] ++;
-			case 'p':
+			}
+			else if(VariableList.get(i).datatype == 'p')
+			{
 				VariableList.get(i).Register = "$a" + datatypes[2];
 				datatypes[2] ++;
 			}
@@ -328,6 +335,7 @@ public class VariableList {
 				compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
 			}
 		}
+		System.out.println(compiledMIPS);
 		return compiledMIPS;
 	}
 	String findRegister(String name)
