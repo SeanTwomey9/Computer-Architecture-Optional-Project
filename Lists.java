@@ -572,4 +572,26 @@ public class Lists {
 		convertOp(elseStatement);
 		unusedTemp--;
 	}
+	
+	/**
+	 * Identifies and returns the condition of an if statement
+	 * @param line: the input string containing the condition
+	 */
+	public static String findCondition(String line) {
+		
+		StringBuilder newCondition = new StringBuilder();
+		
+		int beginCondition =line.indexOf('(') + 1; //Starts with "(" and ends with ")"
+		int endCondition = line.indexOf(')');
+		
+		
+		for(int i = beginCondition; i< endCondition; i++) {
+			
+			newCondition.append(line.charAt(i));
+		}
+		
+		ifConditions.add(newCondition.toString());
+		System.out.println(newCondition.toString());
+		return null;
+	}
 }
