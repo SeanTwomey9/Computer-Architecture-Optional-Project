@@ -8,11 +8,6 @@ public class MIPSConversion {
 	{
 		lines = arr;
 	}
-	
-	public static  ArrayList getLines() {
-			
-			return lines;
-		}
 	void parseLines()
 	{
 		int length = lines.size();
@@ -20,25 +15,29 @@ public class MIPSConversion {
 		{
 			testLine(lines.get(i), i);
 		}
+		assignVariables();
+		varList.convertOperationList();
 	}
 	void testLine(String line, int loc)
 	{
 		String command = "";
 		int k = 0;
-		while(line.charAt(k) != ' ')
+		if(!line.contentEquals("begin") && !line.contentEquals("end") &&!line.contentEquals("endmodule"))
 		{
-			command += line.charAt(k);
-			k ++;
+			while(line.charAt(k) != ' ' && line.charAt(k) != '(')
+			{
+				command += line.charAt(k);
+				k ++;
+			}
+			line = line.substring(k+1);
+			command=command.toLowerCase();
+			testForVariable(line, command, loc);
+			testForOperation(line, command, loc);
 		}
-		line = line.substring(k+1);
-		command=command.toLowerCase();
-		if(command=="always")
-			//testForAlways(line, command);
-		testForVariable(line, command, loc);
 	}
 	void testForVariable(String line, String command, int loc)
 	{
-		switch(command.toLowerCase())
+		switch(command)
 		{
 		case "input":
 			varList.addInputVar(line, loc);
@@ -58,6 +57,27 @@ public class MIPSConversion {
 		default:
 			return;
 		}
+	}
+	void testForOperation(String line, String command, int loc)
+	{
+		if(varList.testForVariable(command) && line.contains("="))
+		{
+			varList.addOperation(new Operation(command, line, loc));
+		}
+		else if(command.contentEquals("assign"))
+		{
+			int i = 1;
+			while(line.charAt(i) != '=')
+			{
+				command += line.charAt(i);
+				i ++;
+			}
+			varList.addOperation(new Operation(command, line.substring(i + 1), loc));
+		}
+	}
+	void assignVariables()
+	{
+		varList.assignVariables();
 	}
 	VariableList getVarList()
 	{
