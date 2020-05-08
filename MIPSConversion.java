@@ -39,6 +39,21 @@ public class MIPSConversion {
 				createModule(line);
 			testForOperation(line, command, loc);
 		}
+		
+		if(command == "if") {
+			
+			testForVariable(line, command, loc);
+			
+			if(command == "else if") {
+				
+				testForVariable(line, command, loc);
+			}
+			
+			if(command == "else") {
+				
+				testForVariable(line, command, loc);
+			}
+		}
 	}
 	void testForVariable(String line, int loc)
 	{
