@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class MIPSConversion {
 	private static ArrayList<String> lines;
-	private VariableList varList = new VariableList();
+	private Lists lists = new Lists();
 	MIPSConversion() {}
 	MIPSConversion(ArrayList<String> arr)
 	{
@@ -16,7 +16,7 @@ public class MIPSConversion {
 			testLine(lines.get(i), i);
 		}
 		assignVariables();
-		varList.convertOperationList();
+		lists.convertOperationList();
 	}
 	void testLine(String line, int loc)
 	{
@@ -40,19 +40,19 @@ public class MIPSConversion {
 		switch(command)
 		{
 		case "input":
-			varList.addInputVar(line, loc);
+			lists.addInputVar(line, loc);
 			return;
 		case "output":
-			varList.addOutputVar(line, loc);
+			lists.addOutputVar(line, loc);
 			return;
 		case "reg":
-			varList.addRegisterVar(line, loc);
+			lists.addRegisterVar(line, loc);
 			return;
 		case "wire":
-			varList.addWireVar(line, loc);
+			lists.addWireVar(line, loc);
 			return;
 		case "parameter":
-			varList.addParameter(line, loc);
+			lists.addParameter(line, loc);
 			return;
 		default:
 			return;
@@ -60,9 +60,9 @@ public class MIPSConversion {
 	}
 	void testForOperation(String line, String command, int loc)
 	{
-		if(varList.testForVariable(command) && line.contains("="))
+		if(lists.testForVariable(command) && line.contains("="))
 		{
-			varList.addOperation(new Operation(command, line, loc));
+			lists.addOperation(new Operation(command, line, loc));
 		}
 		else if(command.contentEquals("assign"))
 		{
@@ -74,15 +74,15 @@ public class MIPSConversion {
 				i ++;
 			}
 			command = command.substring(0, command.length() - 1);
-			varList.addOperation(new Operation(command, line.substring(i), loc));
+			lists.addOperation(new Operation(command, line.substring(i), loc));
 		}
 	}
 	void assignVariables()
 	{
-		varList.assignVariables();
+		lists.assignVariables();
 	}
-	VariableList getVarList()
+	Lists getVarList()
 	{
-		return varList;
+		return lists;
 	}
 }
