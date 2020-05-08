@@ -1,15 +1,12 @@
 import java.util.ArrayList;
 
-public class VariableList {
+public class Lists {
 	ArrayList<Variable> VariableList;
-	ArrayList<Operation> OperationList;
-	private static ArrayList<String> ifConditions = new ArrayList<String>();
 	int unusedTemp;
 	int unusedStack;
- 	VariableList()
+ 	Lists()
 	{
 		VariableList = new ArrayList<Variable>();
-		OperationList = new ArrayList<Operation>();
 		unusedTemp = 0;
 		unusedStack = 0;
 	}
@@ -34,7 +31,7 @@ public class VariableList {
 		{
 			line = removeSize(line);
 			addMultipleVar(line, 'r', loc, '=');
-			addValue(findValue(line, loc), loc);
+			addValue(findNumericValue(line), loc);
 		}
 	}
 	void addWireVar(String line, int loc)
@@ -45,7 +42,7 @@ public class VariableList {
 		{
 			line = removeSize(line);
 			addMultipleVar(line, 'w', loc, '=');
-			addValue(findValue(line, loc), loc);
+			addValue(findNumericValue(line), loc);
 		}
 	}
 	void addOutputVar(String line, int loc)
@@ -63,20 +60,7 @@ public class VariableList {
 			i ++;
 		}
 		line = line.substring(i+1);
-		int value = findValue(line, loc);
-		addVariable(new Variable(name, 'p', value, loc));
-	}
-	void addVariable(Variable var)
-	{
-		for(int i = 0; i < VariableList.size(); i ++)
-		{
-			if(VariableList.get(i).compareTo(var))
-			{
-				VariableList.get(i).changeValue(var);
-				return;
-			}
-		}
-		VariableList.add(var);
+		addVariable(new Variable(name, 'p', findNumericValue(line), loc));
 	}
 	String removeSize(String line)
 	{
@@ -93,11 +77,23 @@ public class VariableList {
 	{
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
-			if(VariableList.get(i).currentAccess == loc)
+			if(VariableList.get(i).declaredLoc == loc)
 			{
-				VariableList.get(i).declaredValue(value);
+				VariableList.get(i).value = value;
 			}
 		}
+	}
+	void addVariable(Variable var)
+	{
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(var.name.contentEquals(VariableList.get(i).name))
+			{
+				VariableList.set(i, var);
+				return;
+			}
+		}
+		VariableList.add(var);
 	}
 	void addMultipleVar(String line, char d, int loc, char param)
 	{
@@ -142,27 +138,6 @@ public class VariableList {
 			}
 			addVariable(new Variable(name, d, loc));
 		}
-	}
-	int findValue(String line, int loc)
-	{
-		int value = 0;
-		if(line.contains("'"))
-		{	
-			value = findNumericValue(line);
-		}
-		else
-		{
-			ArrayList<String> names = new ArrayList<String>();
-			int i = VariableList.size()-1;
-			while(VariableList.get(i).currentAccess != loc)
-			{
-				names.add(VariableList.get(i).name);
-				i --;
-			}
-			for(int j = 0; j < names.size(); j ++)
-				OperationList.add(new Operation(names.get(j), line, loc));
-		}
-		return value;
 	}
 	int findNumericValue(String line)
 	{
@@ -232,35 +207,41 @@ public class VariableList {
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
 			if(name.contentEquals(VariableList.get(i).name))
-				return VariableList.get(i).currentValue;
+				return VariableList.get(i).value;
 		}
 		return 0;
 	}
 	void assignVariables()
 	{
-		int[] datatypes = new int[5];
+		int[] datatypes = new int[4];
 		for(int i = 0; i < VariableList.size(); i ++)
 		{
-			switch(VariableList.get(i).datatype)
+			if(VariableList.get(i).datatype == 'i')
 			{
-			case 'i':
 				VariableList.get(i).Register = "$a" + datatypes[0];
 				datatypes[0] ++;
-			case 'o':
+			}
+			else if(VariableList.get(i).datatype == 'o')
+			{
 				VariableList.get(i).Register = "$v" + datatypes[1];
 				datatypes[1] ++;
-			case 'w':
+			}
+			else if(VariableList.get(i).datatype == 'w')
+			{
 				VariableList.get(i).Register = "$t" + datatypes[2];
 				datatypes[2] ++;
-			case 'r':
+			}
+			else if(VariableList.get(i).datatype == 'r')
+			{
 				VariableList.get(i).Register = "$s" + datatypes[3];
 				datatypes[3] ++;
-			case 'p':
-				VariableList.get(i).Register = "$sp " + datatypes[4];
-				datatypes[4] += 4;
+			}
+			else if(VariableList.get(i).datatype == 'p')
+			{
+				VariableList.get(i).Register = "$a" + datatypes[2];
+				datatypes[2] ++;
 			}
 			unusedTemp = datatypes[2];
-			unusedStack = datatypes[4];
 		}
 	}
 	boolean registerAssigned(String reg)
@@ -272,14 +253,7 @@ public class VariableList {
 		}
 		return false;
 	}
-	void convertOperationList()
-	{
-		for(int i = 0; i < OperationList.size(); i ++)
-		{
-			convertOp(OperationList.get(i));
-		}
-	}
-	void convertOp(Operation oper)
+	ArrayList<String> convertOp(Operation oper)
 	{
 		String temp;
 		int k;
@@ -297,37 +271,72 @@ public class VariableList {
 				k ++;
 			} 
 			boolean end = false;
-			while(!end)
+			if(!temp.contains("'"))
+			{
+				int originalUnusedTemp = unusedTemp;
+				while(!end)
+				{
+					temp = temp.substring(k + 1);
+					k = 0;
+					op = "";
+					input2 = "";
+					while(temp.charAt(k) != ' ')
+					{
+						op += temp.charAt(k);
+						k ++;
+					}
+					temp = temp.substring(k + 1);
+					k = 0;
+					while(!testForVariable(input2))
+					{
+						input2 += temp.charAt(k);
+						k ++;
+					}
+					if(temp.length() == k)
+					{
+						if(input1.contains("$"))
+							compiledMIPS.addAll(operationTable(op, input1, findRegister(input2), findRegister(oper.output)));
+						else
+							compiledMIPS.addAll(operationTable(op, findRegister(input1), findRegister(input2), findRegister(oper.output)));
+						end = true;
+					}
+					else
+					{
+						if(input1.contains("$"))
+							compiledMIPS.addAll(operationTable(op, input1, findRegister(input2), "$t" + unusedTemp));
+						else
+							compiledMIPS.addAll(operationTable(op, findRegister(input1), findRegister(input2), "$t" + unusedTemp));
+						input1 = "$t" + unusedTemp;
+						unusedTemp ++;
+					}
+				}
+				unusedTemp = originalUnusedTemp;
+			}
+			else
 			{
 				temp = temp.substring(k + 1);
 				k = 0;
-				op = "";
-				input2 = "";
 				while(temp.charAt(k) != ' ')
 				{
 					op += temp.charAt(k);
 					k ++;
 				}
 				temp = temp.substring(k + 1);
-				k = 0;
-				while(!testForVariable(input2))
-				{
-					input2 += temp.charAt(k);
-					k ++;
-				}
-				if(temp.length() == k)
-				{
-					compiledMIPS.addAll(operationTable(op, input1, input2, oper.output));
-					end = true;
-				}
-				else
-				{
-					compiledMIPS.addAll(operationTable(op, input1, input2, "$t" + unusedTemp));
-					input1 = "$t" + unusedTemp;
-				}
+				input2 += findNumericValue(temp + ";");
+				compiledMIPS.addAll(operationTable(op, findRegister(input1), input2, findRegister(oper.output)));
 			}
 		}
-		System.out.print(compiledMIPS);
+		System.out.println(compiledMIPS);
+		return compiledMIPS;
+	}
+	String findRegister(String name)
+	{
+		for(int i = 0; i < VariableList.size(); i ++)
+		{
+			if(name.contentEquals(VariableList.get(i).name))
+				return VariableList.get(i).Register;
+		}
+		return "";
 	}
 	ArrayList<String> operationTable(String op, String input1, String input2, String output)
 	{
@@ -547,47 +556,4 @@ public class VariableList {
 			return ops;
 		}
 	}
-	void addOperation(Operation op)
-	{
-		OperationList.add(op);
-	}
-	
-	/**
-	 * Identifies and returns the condition of an if statement
-	 * @param line: the input string containing the condition
-	 */
-	public static String findCondition(String line) {
-		
-		StringBuilder newCondition = new StringBuilder();
-		
-		int beginCondition =line.indexOf('(') + 1; //Starts with "(" and ends with ")"
-		int endCondition = line.indexOf(')');
-		
-		
-		for(int i = beginCondition; i< endCondition; i++) {
-			
-			newCondition.append(line.charAt(i));
-		}
-		
-		ifConditions.add(newCondition.toString());
-		System.out.println(newCondition.toString());
-		return null;
-	}
-	
-	public void evaluateIf(String line, int loc) {
-		
-		Operation ifStatement = new Operation("$t"+unusedTemp, line, loc);
-		unusedTemp++;
-		convertOp(ifStatement);
-		unusedTemp--;
-	}
-	
-	public void evaluateElse(String line, int loc) {
-		
-		Operation elseStatement = new Operation("$t"+unusedTemp, line, loc);
-		unusedTemp++;
-		convertOp(elseStatement);
-		unusedTemp--;
-	}
-	
 }
